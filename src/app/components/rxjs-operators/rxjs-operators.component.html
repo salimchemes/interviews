@@ -1,0 +1,9 @@
+<h2>Operators</h2>
+<ol>
+  <li *ngFor="let operator of operators">
+    <button style="margin: 2px" (click)="performOperator(operator.id)">
+      <b> {{ operator.label }} - {{ operator.group }} </b>
+    </button>
+    <button (click)="stop()" *ngIf="operator.id === 'take'">stop</button>
+  </li>
+</ol>
