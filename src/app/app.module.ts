@@ -9,6 +9,9 @@ import { JavascriptComponent } from './components/javascript/javascript.componen
 import { UnitTestComponent } from './components/unit-test/unit-test.component';
 import { RoutingModule } from './routing/routing.module';
 import { ScssComponent } from './components/scss/scss.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 
 @NgModule({
   declarations: [
@@ -18,8 +21,23 @@ import { ScssComponent } from './components/scss/scss.component';
     UnitTestComponent,
     ScssComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule, RoutingModule],
-  providers: [],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    RoutingModule,
+    NgbModule,
+    NgxJsonViewerModule,
+    HighlightModule,
+  ],
+  providers: [
+    {
+      provide: HIGHLIGHT_OPTIONS,
+      useValue: {
+        fullLibraryLoader: () => import('highlight.js'),
+      },
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

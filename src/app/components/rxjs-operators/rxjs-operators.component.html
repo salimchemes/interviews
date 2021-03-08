@@ -1,9 +1,57 @@
-<h2>Operators</h2>
-<ol>
-  <li *ngFor="let operator of operators">
-    <button style="margin: 2px" (click)="performOperator(operator.id)">
-      <b> {{ operator.label }} - {{ operator.group }} </b>
-    </button>
-    <button (click)="stop()" *ngIf="operator.id === 'take'">stop</button>
-  </li>
-</ol>
+<section>
+  <h2>Operators</h2>
+  <div class="row">
+    <div class="col-1">
+      <ol>
+        <li *ngFor="let operator of operators">
+          <button
+            class="btn-secondary mt-3"
+            (click)="performOperator(operator)"
+          >
+            <b> {{ operator.label }} </b>
+          </button>
+          <button
+            (click)="stop()"
+            class="btn-secondary mt-3 ml-3"
+            *ngIf="operator.id === 'take'"
+          >
+            stop
+          </button>
+        </li>
+      </ol>
+    </div>
+    <div class="col-10">
+      <div>
+        operator: <b>{{ selectedOperator?.label }}</b>
+      </div>
+      <div>
+        group:
+        <b>
+          {{ selectedOperator?.group }}
+        </b>
+      </div>
+      <div>
+        description:
+        <b>
+          {{ selectedOperator?.description }}
+        </b>
+      </div>
+      <div>
+        data:
+        <ngx-json-viewer
+          [json]="this.data"
+          *ngIf="this.data"
+          [expanded]="false"
+        ></ngx-json-viewer>
+      </div>
+      <div>
+        result:
+        <ngx-json-viewer
+          [json]="this.result"
+          *ngIf="this.result"
+          [expanded]="false"
+        ></ngx-json-viewer>
+      </div>
+    </div>
+  </div>
+</section>
