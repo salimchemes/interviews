@@ -10,13 +10,13 @@
           >
             <b> {{ operator.label }} </b>
           </button>
-          <button
+          <!-- <button
             (click)="stop()"
             class="btn-secondary mt-3 ml-3"
             *ngIf="operator.id === 'take'"
           >
             stop
-          </button>
+          </button> -->
         </li>
       </ol>
     </div>
@@ -36,19 +36,21 @@
           {{ selectedOperator?.description }}
         </b>
       </div>
-      <div>
+      <div *ngIf="this.data">
         data:
         <ngx-json-viewer
           [json]="this.data"
-          *ngIf="this.data"
           [expanded]="false"
         ></ngx-json-viewer>
       </div>
-      <div>
+      <div *ngIf="this.method">
+        code:
+        <pre><code [highlight]="this.method"></code></pre>
+      </div>
+      <div *ngIf="this.result">
         result:
         <ngx-json-viewer
           [json]="this.result"
-          *ngIf="this.result"
           [expanded]="false"
         ></ngx-json-viewer>
       </div>

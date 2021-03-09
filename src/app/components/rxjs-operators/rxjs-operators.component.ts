@@ -49,6 +49,8 @@ export class RxjsOperatorsComponent implements OnInit {
   selectedOperator: any;
   data: any;
   result: any;
+  method: any;
+  keyup$: Observable<any> | undefined;
   constructor(private httpClient: HttpClient) {
     this.loading = false;
     this.operators = operators;
@@ -98,17 +100,12 @@ export class RxjsOperatorsComponent implements OnInit {
 
   share() {
     const request = this.getPostsWithShare();
-    this.setLoaderSpinner(request);
-
+    this.loading = true;
+    request.subscribe(() => (this.loading = false));
     request.subscribe((data) => {
       console.log(data);
       this.result = data;
     });
-  }
-
-  setLoaderSpinner(request: import('rxjs').Observable<Object>) {
-    this.loading = true;
-    request.subscribe(() => (this.loading = false));
   }
 
   getPostsWithShare() {
@@ -163,12 +160,12 @@ export class RxjsOperatorsComponent implements OnInit {
     let counter = 0;
     // source.pipe(take(1)).subscribe(() => console.log('clicked'));
     // source.pipe(first()).subscribe(() => console.log('clicked'));
-    // source.pipe(takeWhile(() => counter < 3)).subscribe(() => {
-    //   console.log('clicked', counter);
-    //   this.result += counter;
+    source.pipe(takeWhile(() => counter < 3)).subscribe(() => {
+      console.log('clicked', counter);
 
-    //   counter++;
-    // });
+      counter++;
+      this.result = counter;
+    });
 
     // of(this.data)
     //   .pipe(takeLast(2))
@@ -177,11 +174,11 @@ export class RxjsOperatorsComponent implements OnInit {
     //     this.result = data;
     //   });
 
-    source.pipe(takeUntil(this.onStop)).subscribe(() => {
-      console.log('clicked', counter);
-      counter++;
-      this.result = counter;
-    });
+    // source.pipe(takeUntil(this.onStop)).subscribe(() => {
+    //   console.log('keydown', counter);
+    //   counter++;
+    //   this.result = counter;
+    // });
   }
 
   mergeMap() {
@@ -265,9 +262,9 @@ export class RxjsOperatorsComponent implements OnInit {
 
   pluck() {
     // pick a property frome the obs
-    const keyup$ = fromEvent(document, 'keyup');
+    this.keyup$ = fromEvent(document, 'keyup');
 
-    keyup$
+    this.keyup$
       .pipe(pluck('code'))
       // 'Space', 'Enter'
       .subscribe((data) => {
@@ -293,48 +290,65 @@ export class RxjsOperatorsComponent implements OnInit {
     this.selectedOperator = operator;
     this.data = null;
     this.result = null;
+    this.method = null;
     switch (operator.id) {
       case 'tap':
         this.tap();
+        this.method = this.tap.toString();
         break;
       case 'map':
         this.map();
+        this.method = this.map.toString();
         break;
       case 'pluck':
         this.pluck();
+        this.method = this.pluck.toString();
         break;
       case 'combineLatest':
         this.combineLatest();
+        this.method = this.combineLatest.toString();
         break;
       case 'forkJoin':
         this.forkJoin();
+        this.method = this.forkJoin.toString();
         break;
       case 'take':
         this.take();
+        this.method = this.take.toString();
         break;
       case 'share':
         this.share();
+        this.method = this.share.toString();
         break;
       case 'concat':
         this.concat();
+        this.method = this.concat.toString();
         break;
       case 'switchMap':
         this.switchMap();
+        this.method = this.switchMap.toString();
         break;
       case 'mergeMap':
         this.mergeMap();
+        this.method = this.mergeMap.toString();
         break;
       case 'debounceTime':
         this.debounceTime();
+        this.method = this.debounceTime.toString();
         break;
       case 'from':
         this.from();
+        this.method = this.from.toString();
         break;
       case 'of':
         this.of();
+        this.method = this.of.toString();
         break;
       case 'scan':
         this.scan();
+        this.method = this.scan.toString();
+        break;
+      default:
         break;
     }
   }

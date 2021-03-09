@@ -72,7 +72,7 @@ export const operators = [
     label: 'take',
     group: 'filtering',
     description:
-      'emit provided number of values before completing. We log clicks on document until we press stop button.',
+      'emit provided number of values before completing. We log clicks on document 3 times.',
   },
   {
     id: 'concat',
@@ -106,7 +106,7 @@ export const operators = [
     id: 'share',
     label: 'share',
     group: 'multicasting',
-    share:
-      'share source among multiple subscribers. We get posts from api. Used to avoid multiple API requests. Remove share to check 2 request was performed',
+    description:
+      'share source among multiple subscribers. We get posts from api. Used to avoid multiple API requests. Remove share operator to check 2 requests were performed',
   },
 ];
