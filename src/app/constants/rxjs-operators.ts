@@ -146,10 +146,40 @@ export const operators = [
 ];
 
 export const groups = [
-  'creation',
-  'filtering',
-  'transformation',
-  'combination',
-  'multicasting',
-  'utility',
+  {
+    id: 'creation',
+    label: 'creation',
+    description:
+      'These operators allow the creation of an observable from nearly anything. From generic to specific use-cases you are free, and encouraged, to turn everything into a stream.',
+  },
+  {
+    id: 'filtering',
+    label: 'filtering',
+    description:
+      'In a push based approach, picking and choosing how and when to accept items is important. These operators provide techniques for accepting values from an observable source and dealing with backpressure.',
+  },
+  {
+    id: 'transformation',
+    label: 'transformation',
+    description:
+      'Transforming values as they pass through the operator chain is a common task. These operators provide transformation techniques for nearly any use-case you will encounter.',
+  },
+  {
+    id: 'combination',
+    label: 'combination',
+    description:
+      'The combination operators allow the joining of information from multiple observables. Order, time, and structure of emitted values is the primary variation among these operators.',
+  },
+  {
+    id: 'multicasting',
+    label: 'multicasting',
+    description:
+      'In RxJS observables are cold, or unicast by default. These operators can make an observable hot, or multicast, allowing side-effects to be shared among multiple subscribers.',
+  },
+  {
+    id: 'utility',
+    label: 'utility',
+    description:
+      'From logging, handling notifications, to setting up schedulers, these operators provide helpful utilities in your observable toolkit.',
+  },
 ];

@@ -39,7 +39,7 @@ export class RxjsOperatorsComponent implements OnInit {
     | { id: string; label: string; group: string }
     | { id: string; label: string; group: string }
   )[];
-  groups: string[];
+  groups: { id: string; label: string; description: string }[];
   personObs: Observable<any>;
   personPromise: Promise<any>;
   person: any = {
@@ -47,6 +47,7 @@ export class RxjsOperatorsComponent implements OnInit {
     age: 20,
   };
   selectedOperator: any;
+  selectedGroup: any;
   data: any;
   result: any;
   method: any;
@@ -77,11 +78,12 @@ export class RxjsOperatorsComponent implements OnInit {
     this.method = this[functionName].toString();
   }
 
-  filterByGroup(group: string) {
+  filterByGroup(group) {
     this.selectedOperator = null;
+    this.selectedGroup = group;
     this.cleanResults();
     this.operators = this.originalOperators.filter(
-      (operator) => operator.group === group
+      (operator) => operator.group === group.id
     );
   }
 

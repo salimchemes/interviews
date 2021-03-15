@@ -1,14 +1,24 @@
 <section>
   <div class="row">
-    <div class="col-2">
+    <div class="col-1">
       <h2>Groups</h2>
       <ol>
         <li *ngFor="let group of groups">
           <button class="btn-secondary mt-3" (click)="filterByGroup(group)">
-            <b> {{ group }} </b>
+            <b> {{ group.label }} </b>
           </button>
         </li>
       </ol>
+    </div>
+    <div class="col-2">
+      <h2>Description</h2>
+      <p>
+        <span
+          ><strong>
+            {{ this.selectedGroup.label }}
+          </strong></span
+        >: {{ this.selectedGroup?.description }}
+      </p>
     </div>
     <div class="col-2">
       <h2>Operators</h2>
@@ -23,7 +33,7 @@
         </li>
       </ol>
     </div>
-    <div class="col-8" *ngIf="selectedOperator">
+    <div class="col-6" *ngIf="selectedOperator">
       <div>
         operator: <b>{{ selectedOperator?.label }}</b>
       </div>
