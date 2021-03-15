@@ -6,9 +6,10 @@ import {
   forkJoin,
   from,
   fromEvent,
+  interval,
   Observable,
   of,
-  Subject,
+  timer,
 } from 'rxjs';
 import {
   debounceTime,
@@ -16,6 +17,8 @@ import {
   first,
   map,
   mergeMap,
+  pluck,
+  scan,
   share,
   switchMap,
   take,
@@ -23,10 +26,8 @@ import {
   takeUntil,
   takeWhile,
   tap,
-  pluck,
-  scan,
 } from 'rxjs/operators';
-import { operators } from 'src/app/constants/rxjs-operators';
+import { groups, operators } from 'src/app/constants/rxjs-operators';
 
 @Component({
   selector: 'app-rxjs-operators',
@@ -35,25 +36,34 @@ import { operators } from 'src/app/constants/rxjs-operators';
 })
 export class RxjsOperatorsComponent implements OnInit {
   loading: boolean;
-  onStop = new Subject<void>();
   operators: (
     | { id: string; label: string; group: string }
     | { id: string; label: string; group: string }
   )[];
+  groups: string[];
   personObs: Observable<any>;
   personPromise: Promise<any>;
   person: any = {
-    name: 'salim',
-    age: 34,
+    name: 'john',
+    age: 20,
   };
   selectedOperator: any;
   data: any;
   result: any;
   method: any;
   keyup$: Observable<any> | undefined;
+  originalOperators: {
+    id: string;
+    label: string;
+    group: string;
+    description: string;
+  }[];
   constructor(private httpClient: HttpClient) {
     this.loading = false;
     this.operators = operators;
+    this.originalOperators = operators;
+    this.groups = groups;
+    this.filterByGroup(this.groups[0]);
     this.personObs = of(this.person);
     this.personPromise = Promise.resolve(this.person);
   }
@@ -68,7 +78,6 @@ export class RxjsOperatorsComponent implements OnInit {
   of() {
     this.data = [1, 2, 3, 4];
     of(this.data).subscribe((data) => {
-      console.log(data + 'text');
       this.result = data + 'text';
     });
   }
@@ -77,7 +86,6 @@ export class RxjsOperatorsComponent implements OnInit {
     this.data = [1, 2, 3, 4];
 
     from(this.data).subscribe((value) => {
-      console.log(value + 'text');
       this.result = this.result + value + 'text';
     });
   }
@@ -93,7 +101,6 @@ export class RxjsOperatorsComponent implements OnInit {
     this.personObs
       .pipe(map((person: any) => person.name))
       .subscribe((person: any) => {
-        console.log(person);
         this.result = person;
       });
   }
@@ -103,7 +110,6 @@ export class RxjsOperatorsComponent implements OnInit {
     this.loading = true;
     request.subscribe(() => (this.loading = false));
     request.subscribe((data) => {
-      console.log(data);
       this.result = data;
     });
   }
@@ -132,8 +138,6 @@ export class RxjsOperatorsComponent implements OnInit {
       switchMap((posts) => {
         return comments.pipe(
           tap((comments) => {
-            console.log(comments);
-            console.log(posts);
             this.result = { ...comments, ...posts };
           })
         );
@@ -154,37 +158,56 @@ export class RxjsOperatorsComponent implements OnInit {
       .subscribe();
   }
 
-  take() {
-    // this.data = [1, 2, 3, 4];
-    const source = fromEvent(document, 'click');
-    let counter = 0;
-    // source.pipe(take(1)).subscribe(() => console.log('clicked'));
-    // source.pipe(first()).subscribe(() => console.log('clicked'));
-    source.pipe(takeWhile(() => counter < 3)).subscribe(() => {
-      console.log('clicked', counter);
+  first() {
+    this.data = [1, 2, 3, 4];
+    from(this.data)
+      .pipe(first())
+      .subscribe((value) => (this.result = value));
+  }
 
+  takeWhile() {
+    let counter = 0;
+    const source = interval(1000);
+    source.pipe(takeWhile(() => counter < 3)).subscribe(() => {
       counter++;
       this.result = counter;
     });
+  }
 
-    // of(this.data)
-    //   .pipe(takeLast(2))
-    //   .subscribe((data) => {
-    //     console.log(data);
-    //     this.result = data;
-    //   });
+  takeLast() {
+    this.data = [1, 2, 3, 4];
+    from(this.data)
+      .pipe(takeLast(2))
+      .subscribe((value) => {
+        this.result += value;
+      });
+  }
 
-    // source.pipe(takeUntil(this.onStop)).subscribe(() => {
-    //   console.log('keydown', counter);
-    //   counter++;
-    //   this.result = counter;
-    // });
+  take() {
+    this.data = [1, 2, 3, 4];
+
+    from(this.data)
+      .pipe(take(1))
+      .subscribe((value) => (this.result = value));
+  }
+
+  takeUntil() {
+    //emit value every 1s
+    const source = interval(1000);
+    //after 5 seconds, emit value
+    const timer$ = timer(5000);
+    //when timer emits after 5s, complete source
+    const example = source.pipe(takeUntil(timer$));
+    //output: 0,1,2,3
+    const subscribe = example.subscribe((val) => {
+      this.result = val;
+    });
   }
 
   mergeMap() {
     // declare 2 obs
     const carColorObs = of({ color: 'blue' });
-    const carDriverObs = of({ driver: 'salim' });
+    const carDriverObs = of({ driver: 'john' });
 
     // merge map and map generating a new map (flatMap is exactly the same)
     const carObs: Observable<any> = carColorObs.pipe(
@@ -203,29 +226,22 @@ export class RxjsOperatorsComponent implements OnInit {
     );
 
     carObs.subscribe((car) => {
-      console.log(car);
       this.result = { car: car };
     });
   }
 
-  private concat() {
+  concat() {
     // declare 2 obs
     const carColorObs = of({ color: 'blue' });
-    const carDriverObs = of({ driver: 'salim' });
-    this.data = { color: 'blue', driver: 'salim' };
+    const carDriverObs = of({ driver: 'john' });
+    this.data = { color: 'blue', driver: 'john' };
     // its from rxjs not from rxjs/operators
     // it is going to emit one value for each obs in order
     const combined = concat(carColorObs, carDriverObs);
 
     combined.subscribe((data) => {
-      console.log(data);
       this.result = { ...this.result, ...data };
     });
-  }
-
-  stop() {
-    this.onStop.next();
-    this.onStop.complete();
   }
 
   forkJoin() {
@@ -236,7 +252,6 @@ export class RxjsOperatorsComponent implements OnInit {
     const combined = forkJoin(comments, posts);
 
     combined.subscribe((combined) => {
-      console.log(combined);
       this.result = combined;
     });
   }
@@ -255,7 +270,6 @@ export class RxjsOperatorsComponent implements OnInit {
     const combined = combineLatest(comments, posts);
 
     combined.subscribe((combined) => {
-      console.log(combined, 'combine latest');
       this.result = { ...this.result, combined };
     });
   }
@@ -268,7 +282,6 @@ export class RxjsOperatorsComponent implements OnInit {
       .pipe(pluck('code'))
       // 'Space', 'Enter'
       .subscribe((data) => {
-        console.log(data);
         this.result = data;
       });
   }
@@ -280,76 +293,30 @@ export class RxjsOperatorsComponent implements OnInit {
     const example = source.pipe(scan((acc, curr) => acc + curr, 0));
     // log accumulated values
     // output: 1,3,6
-    const subscribe = example.subscribe((val) => {
-      console.log(val);
+    example.subscribe((val) => {
       this.result = val;
     });
   }
 
   performOperator(operator: any) {
     this.selectedOperator = operator;
+    this.cleanResults();
+    const functionName = operator.id;
+    this[functionName]();
+    this.method = this[functionName].toString();
+  }
+
+  private cleanResults() {
     this.data = null;
     this.result = null;
     this.method = null;
-    switch (operator.id) {
-      case 'tap':
-        this.tap();
-        this.method = this.tap.toString();
-        break;
-      case 'map':
-        this.map();
-        this.method = this.map.toString();
-        break;
-      case 'pluck':
-        this.pluck();
-        this.method = this.pluck.toString();
-        break;
-      case 'combineLatest':
-        this.combineLatest();
-        this.method = this.combineLatest.toString();
-        break;
-      case 'forkJoin':
-        this.forkJoin();
-        this.method = this.forkJoin.toString();
-        break;
-      case 'take':
-        this.take();
-        this.method = this.take.toString();
-        break;
-      case 'share':
-        this.share();
-        this.method = this.share.toString();
-        break;
-      case 'concat':
-        this.concat();
-        this.method = this.concat.toString();
-        break;
-      case 'switchMap':
-        this.switchMap();
-        this.method = this.switchMap.toString();
-        break;
-      case 'mergeMap':
-        this.mergeMap();
-        this.method = this.mergeMap.toString();
-        break;
-      case 'debounceTime':
-        this.debounceTime();
-        this.method = this.debounceTime.toString();
-        break;
-      case 'from':
-        this.from();
-        this.method = this.from.toString();
-        break;
-      case 'of':
-        this.of();
-        this.method = this.of.toString();
-        break;
-      case 'scan':
-        this.scan();
-        this.method = this.scan.toString();
-        break;
-      default:
-        break;
-    }
+  }
+
+  filterByGroup(group: string) {
+    this.selectedOperator = null;
+    this.cleanResults();
+    this.operators = this.originalOperators.filter(
+      (operator) => operator.group === group
+    );
   }
 }

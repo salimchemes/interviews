@@ -1,3 +1,8 @@
+export const arrayData = [1, 2, 3, 4];
+export const person = {
+  name: 'john',
+  age: 20,
+};
 export const operators = [
   {
     id: 'of',
@@ -5,12 +10,14 @@ export const operators = [
     group: 'creation',
     description:
       'emit variable amount of values in a sequence and then emits a single complete notification',
+    data: arrayData,
   },
   {
     id: 'from',
     label: 'from',
     group: 'creation',
     description: 'turn an array, promise, or iterable into an observable.',
+    data: arrayData,
   },
   {
     id: 'map',
@@ -72,7 +79,34 @@ export const operators = [
     label: 'take',
     group: 'filtering',
     description:
-      'emit provided number of values before completing. We log clicks on document 3 times.',
+      'emit provided number of values before completing. We take the first value emitted from an array of streams',
+  },
+  {
+    id: 'takeUntil',
+    label: 'takeUntil',
+    group: 'filtering',
+    description:
+      'emit values until provided observable emits. Will emit for every second until timer$ is completed after 5s',
+  },
+  {
+    id: 'takeLast',
+    label: 'takeLast',
+    group: 'filtering',
+    description:
+      'emit the last n emitted values before completion. Sum last 2 digits from an array',
+  },
+  {
+    id: 'takeWhile',
+    label: 'takeWhile',
+    group: 'filtering',
+    description:
+      'emit values until provided expression is false. Console log counter until counter < 3',
+  },
+  {
+    id: 'first',
+    label: 'first',
+    group: 'filtering',
+    description: 'emit the first value or first to pass provided expression',
   },
   {
     id: 'concat',
@@ -109,4 +143,13 @@ export const operators = [
     description:
       'share source among multiple subscribers. We get posts from api. Used to avoid multiple API requests. Remove share operator to check 2 requests were performed',
   },
+];
+
+export const groups = [
+  'creation',
+  'filtering',
+  'transformation',
+  'combination',
+  'multicasting',
+  'utility',
 ];
