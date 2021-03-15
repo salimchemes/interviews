@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
   combineLatest,
@@ -19,7 +18,6 @@ import {
   mergeMap,
   pluck,
   scan,
-  share,
   switchMap,
   take,
   takeLast,
@@ -28,6 +26,7 @@ import {
   tap,
 } from 'rxjs/operators';
 import { groups, operators } from 'src/app/constants/rxjs-operators';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-rxjs-operators',
@@ -58,7 +57,7 @@ export class RxjsOperatorsComponent implements OnInit {
     group: string;
     description: string;
   }[];
-  constructor(private httpClient: HttpClient) {
+  constructor(private apiService: ApiService) {
     this.loading = false;
     this.operators = operators;
     this.originalOperators = operators;
@@ -70,14 +69,27 @@ export class RxjsOperatorsComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  subscribe(personObs: any, personPromise: Promise<any>) {
-    personObs.subscribe((data: any) => console.log(data));
-    from(personPromise).subscribe((data) => console.log(data));
+  performOperator(operator: any) {
+    this.selectedOperator = operator;
+    this.cleanResults();
+    const functionName = operator.id;
+    this[functionName]();
+    this.method = this[functionName].toString();
   }
 
+  filterByGroup(group: string) {
+    this.selectedOperator = null;
+    this.cleanResults();
+    this.operators = this.originalOperators.filter(
+      (operator) => operator.group === group
+    );
+  }
+
+  //#region operators
   of() {
     this.data = [1, 2, 3, 4];
-    of(this.data).subscribe((data) => {
+    const source = of(this.data);
+    source.subscribe((data) => {
       this.result = data + 'text';
     });
   }
@@ -85,7 +97,9 @@ export class RxjsOperatorsComponent implements OnInit {
   from() {
     this.data = [1, 2, 3, 4];
 
-    from(this.data).subscribe((value) => {
+    const source = from(this.data);
+
+    source.subscribe((value) => {
       this.result = this.result + value + 'text';
     });
   }
@@ -106,7 +120,7 @@ export class RxjsOperatorsComponent implements OnInit {
   }
 
   share() {
-    const request = this.getPostsWithShare();
+    const request = this.apiService.getPostsWithShare();
     this.loading = true;
     request.subscribe(() => (this.loading = false));
     request.subscribe((data) => {
@@ -114,25 +128,11 @@ export class RxjsOperatorsComponent implements OnInit {
     });
   }
 
-  getPostsWithShare() {
-    return this.httpClient
-      .get('https://jsonplaceholder.typicode.com/posts')
-      .pipe(share());
-  }
-
-  getPosts() {
-    return this.httpClient.get('https://jsonplaceholder.typicode.com/posts');
-  }
-
-  getComments() {
-    return this.httpClient.get('https://jsonplaceholder.typicode.com/comments');
-  }
-
   switchMap() {
     // cancel from one obs and switch to another having access to both
 
-    const posts = this.getPosts();
-    const comments = this.getComments();
+    const posts = this.apiService.getPosts();
+    const comments = this.apiService.getComments();
 
     const combined = posts.pipe(
       switchMap((posts) => {
@@ -245,8 +245,8 @@ export class RxjsOperatorsComponent implements OnInit {
   }
 
   forkJoin() {
-    const comments = this.getComments();
-    const posts = this.getPosts();
+    const comments = this.apiService.getComments();
+    const posts = this.apiService.getPosts();
 
     // finish all the observables and emit an array with all of them
     const combined = forkJoin(comments, posts);
@@ -257,8 +257,8 @@ export class RxjsOperatorsComponent implements OnInit {
   }
 
   combineLatest() {
-    const comments = this.getComments();
-    const posts = this.getPosts();
+    const comments = this.apiService.getComments();
+    const posts = this.apiService.getPosts();
 
     // Not only does forkJoin require all input observables to be completed,
     // but it also returns an observable that produces a single value that is an array of the last values produced by the input observables.In other words,
@@ -275,7 +275,7 @@ export class RxjsOperatorsComponent implements OnInit {
   }
 
   pluck() {
-    // pick a property frome the obs
+    // pick a property from the obs
     this.keyup$ = fromEvent(document, 'keyup');
 
     this.keyup$
@@ -297,26 +297,11 @@ export class RxjsOperatorsComponent implements OnInit {
       this.result = val;
     });
   }
-
-  performOperator(operator: any) {
-    this.selectedOperator = operator;
-    this.cleanResults();
-    const functionName = operator.id;
-    this[functionName]();
-    this.method = this[functionName].toString();
-  }
+  //#endregion
 
   private cleanResults() {
     this.data = null;
     this.result = null;
     this.method = null;
-  }
-
-  filterByGroup(group: string) {
-    this.selectedOperator = null;
-    this.cleanResults();
-    this.operators = this.originalOperators.filter(
-      (operator) => operator.group === group
-    );
   }
 }
