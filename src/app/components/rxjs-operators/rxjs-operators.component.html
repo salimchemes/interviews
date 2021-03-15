@@ -4,7 +4,7 @@
       <h2>Groups</h2>
       <ol>
         <li *ngFor="let group of groups">
-          <button class="btn-secondary mt-3" (click)="filterByGroup(group)">
+          <button class="btn btn-dark mt-3" (click)="filterByGroup(group)">
             <b> {{ group.label }} </b>
           </button>
         </li>
@@ -24,10 +24,7 @@
       <h2>Operators</h2>
       <ol>
         <li *ngFor="let operator of operators">
-          <button
-            class="btn-secondary mt-3"
-            (click)="performOperator(operator)"
-          >
+          <button class="btn btn-dark mt-3" (click)="performOperator(operator)">
             <b> {{ operator.label }} </b>
           </button>
         </li>

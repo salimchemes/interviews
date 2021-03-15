@@ -107,6 +107,7 @@ export class RxjsOperatorsComponent implements OnInit {
   }
 
   tap() {
+    this.data = this.person;
     this.personObs
       .pipe(tap((person: any) => console.log(person.name)))
       .subscribe((person: any) => console.log(person));
